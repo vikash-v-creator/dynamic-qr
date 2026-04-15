@@ -117,18 +117,23 @@ app.get('/test', (req, res) => {
   res.send('Server working — routes active');
 });
 
-// ── GET /debug — shows registered routes ─────────
+// ── GET /debug — safe route list ─────────────────
 app.get('/debug', (req, res) => {
-  const routes = [];
-  app._router.stack.forEach((layer) => {
-    if (layer.route) {
-      routes.push({
-        method: Object.keys(layer.route.methods).join(',').toUpperCase(),
-        path: layer.route.path,
-      });
-    }
-  });
-  res.json({ status: 'ok', routes });
+  try {
+    res.json({
+      status: 'ok',
+      routes: [
+        'POST /api/create',
+        'POST /api/update/:id',
+        'GET /test',
+        'GET /debug',
+        'GET /q/:id',
+        'CATCH-ALL (last)'
+      ]
+    });
+  } catch (err) {
+    res.status(500).send('Debug failed');
+  }
 });
 
 // ── GET /q/:id ───────────────────────────────────
@@ -154,6 +159,12 @@ app.get('/q/:id', async (req, res) => {
 // ── Catch-all: serve frontend for any unmatched route ──
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ── Global error handler ─────────────────────────
+app.use((err, req, res, next) => {
+  console.error('GLOBAL ERROR:', err);
+  res.status(500).send('Internal Server Error');
 });
 
 // ── Start server ─────────────────────────────────
