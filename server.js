@@ -139,19 +139,31 @@ app.get('/debug', (req, res) => {
 // ── GET /q/:id ───────────────────────────────────
 // Looks up the short ID in Firestore and redirects (or 404s)
 app.get('/q/:id', async (req, res) => {
-  console.log('HIT QR ROUTE:', req.params.id);
+  const id = req.params.id;
+  console.log('QR HIT:', id);
 
   try {
-    const doc = await db.collection('qrs').doc(req.params.id).get();
+    const doc = await db.collection('qrs').doc(id).get();
+    console.log('DOC EXISTS:', doc.exists);
 
     if (!doc.exists) {
+      console.log('NO DOC FOUND for id:', id);
       return res.status(404).send('Invalid QR');
     }
 
-    const { url } = doc.data();
-    return res.redirect(url);
+    const data = doc.data();
+    console.log('DATA:', JSON.stringify(data));
+
+    if (!data || !data.url) {
+      console.log('DOC exists but no url field');
+      return res.status(404).send('Invalid QR - no URL');
+    }
+
+    console.log('REDIRECTING TO:', data.url);
+    return res.redirect(data.url);
   } catch (err) {
-    console.error('Error fetching QR:', err.message);
+    console.error('FIRESTORE ERROR:', err.message);
+    console.error('FULL ERROR:', err);
     return res.status(500).send('Server error');
   }
 });
