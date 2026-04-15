@@ -13,6 +13,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── Request logger (debug — remove after fix confirmed) ──
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // ── Firestore refs ───────────────────────────────
 const qrsCollection = db.collection('qrs');
 
@@ -108,7 +114,21 @@ app.post('/api/update/:id', async (req, res) => {
 // ── GET /test ────────────────────────────────────
 // Health check for debugging on Render
 app.get('/test', (req, res) => {
-  res.send('Server working');
+  res.send('Server working — routes active');
+});
+
+// ── GET /debug — shows registered routes ─────────
+app.get('/debug', (req, res) => {
+  const routes = [];
+  app._router.stack.forEach((layer) => {
+    if (layer.route) {
+      routes.push({
+        method: Object.keys(layer.route.methods).join(',').toUpperCase(),
+        path: layer.route.path,
+      });
+    }
+  });
+  res.json({ status: 'ok', routes });
 });
 
 // ── GET /q/:id ───────────────────────────────────
