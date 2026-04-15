@@ -1,0 +1,385 @@
+/* ── Reset & Base ─────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #08080c;
+  --bg-card: #111118;
+  --bg-card-hover: #16161f;
+  --bg-input: #0e0e15;
+  --accent: #6c5ce7;
+  --accent-light: #a29bfe;
+  --accent-glow: rgba(108, 92, 231, 0.15);
+  --accent-glow-strong: rgba(108, 92, 231, 0.3);
+  --text: #e4e4ec;
+  --text-muted: #6b6b80;
+  --text-dim: #44445a;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-focus: rgba(108, 92, 231, 0.5);
+  --danger: #ff6b6b;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── App Layout ──────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.bg-glow {
+  position: fixed;
+  top: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Header ──────────────────────────────────── */
+.header {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.logo-icon {
+  color: var(--accent);
+}
+
+.accent {
+  color: var(--accent-light);
+}
+
+/* ── Main ────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.25rem 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-text {
+  text-align: center;
+  max-width: 520px;
+  margin-bottom: 2.5rem;
+}
+
+.hero-text h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+}
+
+.hero-text p {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ── Generator Card ──────────────────────────── */
+.generator-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: border-color var(--transition);
+}
+
+.generator-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.input-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 0.85rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input-wrapper.error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.12);
+}
+
+.input-icon {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.input-wrapper input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 0.85rem 0.65rem;
+  width: 100%;
+}
+
+.input-wrapper input::placeholder {
+  color: var(--text-dim);
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color var(--transition), background var(--transition);
+}
+
+.clear-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Generate Button */
+.generate-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 1.4rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition), transform 0.1s ease, box-shadow var(--transition);
+}
+
+.generate-btn:hover {
+  background: #7c6ef0;
+  box-shadow: 0 4px 20px var(--accent-glow-strong);
+}
+
+.generate-btn:active {
+  transform: scale(0.97);
+}
+
+/* Error message */
+.error-msg {
+  color: var(--danger);
+  font-size: 0.82rem;
+  margin-top: 0.65rem;
+  padding-left: 0.2rem;
+}
+
+/* ── QR Output ───────────────────────────────── */
+.qr-output {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 560px;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.qr-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.qr-canvas-wrap {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.qr-canvas-wrap canvas,
+.qr-canvas-wrap img {
+  display: block;
+  width: 200px;
+  height: 200px;
+}
+
+.qr-url {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* Download Buttons */
+.download-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.dl-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), transform 0.1s ease;
+}
+
+.dl-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dl-btn:active {
+  transform: scale(0.97);
+}
+
+/* ── Footer ──────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.footer p {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ── Utilities ───────────────────────────────── */
+.hidden {
+  display: none !important;
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 520px) {
+  .main {
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .hero-text {
+    margin-bottom: 1.75rem;
+  }
+
+  .input-row {
+    flex-direction: column;
+  }
+
+  .generate-btn {
+    justify-content: center;
+    padding: 0.85rem 1.2rem;
+  }
+
+  .generator-card {
+    padding: 1.15rem;
+  }
+
+  .qr-card {
+    padding: 1.5rem;
+  }
+
+  .qr-canvas-wrap {
+    padding: 1rem;
+  }
+
+  .qr-canvas-wrap canvas,
+  .qr-canvas-wrap img {
+    width: 170px;
+    height: 170px;
+  }
+}
