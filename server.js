@@ -11,7 +11,7 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 // ── Middleware ────────────────────────────────────
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Firestore refs ───────────────────────────────
 const qrsCollection = db.collection('qrs');
