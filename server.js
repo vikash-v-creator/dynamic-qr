@@ -132,7 +132,7 @@ app.get('/q/:id', async (req, res) => {
 });
 
 // ── Catch-all: serve frontend for any unmatched route ──
-app.get('*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
