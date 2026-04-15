@@ -105,12 +105,19 @@ app.post('/api/update/:id', async (req, res) => {
   }
 });
 
+// ── GET /test ────────────────────────────────────
+// Health check for debugging on Render
+app.get('/test', (req, res) => {
+  res.send('Server working');
+});
+
 // ── GET /q/:id ───────────────────────────────────
 // Looks up the short ID in Firestore and redirects (or 404s)
 app.get('/q/:id', async (req, res) => {
+  console.log('HIT QR ROUTE:', req.params.id);
+
   try {
-    const { id } = req.params;
-    const doc = await qrsCollection.doc(id).get();
+    const doc = await db.collection('qrs').doc(req.params.id).get();
 
     if (!doc.exists) {
       return res.status(404).send('Invalid QR');
@@ -124,7 +131,12 @@ app.get('/q/:id', async (req, res) => {
   }
 });
 
+// ── Catch-all: serve frontend for any unmatched route ──
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // ── Start server ─────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`Server running → ${BASE_URL}`);
+  console.log(`Server running on port ${PORT} → ${BASE_URL}`);
 });
