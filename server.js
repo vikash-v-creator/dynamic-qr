@@ -57,10 +57,12 @@ async function generateUniqueId() {
 }
 
 // ── POST /api/create ─────────────────────────────
-// Accepts { url } in body, stores in Firestore, returns short QR link
+// Accepts { url, uid } in body, stores in Firestore, returns short QR link
 app.post('/api/create', async (req, res) => {
   try {
-    const url = validateUrl(req.body.url);
+    const { url: requestUrl, uid, designConfig } = req.body;
+    
+    const url = validateUrl(requestUrl);
     if (!url) {
       return res.status(400).json({ error: 'Invalid URL' });
     }
@@ -70,6 +72,8 @@ app.post('/api/create', async (req, res) => {
 
     await qrsCollection.doc(id).set({
       url,
+      uid: uid || null,
+      designConfig: designConfig || {},
       createdAt: now,
       updatedAt: now,
     });
@@ -84,6 +88,38 @@ app.post('/api/create', async (req, res) => {
   }
 });
 
+// ── GET /api/my-qr/:uid ──────────────────────────
+// Returns all QRs belonging to a given user UID
+app.get('/api/my-qr/:uid', async (req, res) => {
+  try {
+    // TODO: verify Firebase ID token for real security
+    const { uid } = req.params;
+    if (!uid) {
+      return res.status(400).json({ error: 'Missing uid' });
+    }
+
+    const snapshot = await qrsCollection
+      .where('uid', '==', uid)
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    const qrs = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        url: data.url,
+        qrUrl: `${BASE_URL}/q/${doc.id}`,
+        createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
+      };
+    });
+
+    return res.json(qrs);
+  } catch (err) {
+    console.error('Error fetching user QRs:', err.message);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // ── POST /api/update/:id ─────────────────────────
 // Accepts { url } in body, updates existing Firestore doc
 app.post('/api/update/:id', async (req, res) => {
@@ -93,18 +129,29 @@ app.post('/api/update/:id', async (req, res) => {
     if (!url) {
       return res.status(400).json({ error: 'Invalid URL' });
     }
+    
+    const designConfig = req.body.designConfig || null;
 
-    const doc = await qrsCollection.doc(id).get();
+    const qrsRef = qrsCollection.doc(id);
+    const doc = await qrsRef.get();
+
     if (!doc.exists) {
       return res.status(404).json({ error: 'QR not found' });
     }
 
-    await qrsCollection.doc(id).update({
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    const updateData = {
       url,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+      updatedAt: now
+    };
+    
+    if (designConfig) {
+      updateData.designConfig = designConfig;
+    }
 
-    return res.json({ message: 'QR updated successfully' });
+    await qrsRef.update(updateData);
+
+    return res.json({ success: true, url, designConfig });
   } catch (err) {
     console.error('Error updating QR:', err.message);
     return res.status(500).json({ error: 'Server error' });

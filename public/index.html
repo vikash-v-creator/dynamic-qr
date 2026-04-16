@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Generate QR codes instantly from any URL. Free, fast, no sign-up required.">
-  <title>QR Generator — Instant QR Codes</title>
+  <meta name="description" content="Dynamic QR code generator with user accounts. Create, manage and update your QR codes anytime.">
+  <title>QR Generator — Dynamic QR Codes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,68 +24,213 @@
         </svg>
         <span>QR <span class="accent">Generator</span></span>
       </div>
+      <!-- Auth status shown in header once logged in -->
+      <div class="header-auth" id="headerAuth" style="display:none;">
+        <span class="user-email" id="headerEmail"></span>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main">
-      <div class="hero-text">
-        <h1>Generate <span class="accent">QR Codes</span> Instantly</h1>
-        <p>Paste any URL, get a scannable QR code in seconds. No sign-up, no tracking, completely free.</p>
-      </div>
+    <!-- ── AUTH PANEL (shown when logged out) ── -->
+    <section class="auth-panel" id="authPanel">
+      <div class="auth-card">
+        <h2>Sign in to your account</h2>
+        <p class="auth-sub">Create and manage dynamic QR codes linked to your account.</p>
 
-      <!-- Generator Card -->
-      <div class="generator-card" id="generatorCard">
-        <div class="input-row">
-          <div class="input-wrapper" id="inputWrapper">
-            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-            <input
-              type="url"
-              id="urlInput"
-              placeholder="https://example.com"
-              autocomplete="off"
-              spellcheck="false"
-            >
-            <button class="clear-btn hidden" id="clearBtn" aria-label="Clear input">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <div class="auth-field">
+          <label for="authEmail">Email</label>
+          <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label for="authPassword">Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <p class="auth-error hidden" id="authError"></p>
+
+        <div class="auth-buttons">
+          <button class="auth-btn primary" id="loginBtn">Login</button>
+          <button class="auth-btn secondary" id="signupBtn">Sign Up</button>
+        </div>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <button class="google-btn" id="googleBtn">
+          <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            <path fill="none" d="M0 0h48v48H0z"/>
+          </svg>
+          <span>Sign in with Google</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── MAIN APP (shown when logged in) ── -->
+    <div id="appContent" style="display:none;">
+
+      <!-- Main Content -->
+      <main class="main">
+        <div class="hero-text">
+          <h1>Generate <span class="accent">QR Codes</span> Instantly</h1>
+          <p>Paste any URL, get a scannable dynamic QR code. Update the destination anytime — same QR code, forever.</p>
+        </div>
+
+        <!-- Generator Card -->
+        <div class="generator-card" id="generatorCard">
+          <div class="input-row">
+            <div class="input-wrapper" id="inputWrapper">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              <input
+                type="url"
+                id="urlInput"
+                placeholder="https://example.com"
+                autocomplete="off"
+                spellcheck="false"
+              >
+              <button class="clear-btn hidden" id="clearBtn" aria-label="Clear input">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <button class="generate-btn" id="generateBtn">
+              <span>Generate</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
-          <button class="generate-btn" id="generateBtn">
-            <span>Generate</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <p class="error-msg hidden" id="errorMsg">Please enter a valid URL (e.g. https://example.com)</p>
+        </div>
+
+        <!-- Editor Layout (Controls + Preview) -->
+        <div class="editor-layout hidden" id="editorLayout">
+          <div class="editor-controls">
+            <h3>Customize design</h3>
+            
+            <div class="control-group">
+              <h4>Colors</h4>
+              <div class="color-pickers">
+                <label class="color-label">
+                  <input type="color" id="patternColor" value="#000000">
+                  <span>Pattern color</span>
+                </label>
+                <label class="color-label">
+                  <input type="color" id="eyeColor" value="#000000">
+                  <span>Eye color</span>
+                </label>
+                <label class="color-label">
+                  <input type="color" id="bgColor" value="#ffffff">
+                  <span>Background color</span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <h4>Pattern</h4>
+              <div class="style-buttons" id="patternStyleBtns">
+                <button type="button" class="style-btn active" data-val="square">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>
+                  <span>Square</span>
+                </button>
+                <button type="button" class="style-btn" data-val="dots">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="7" r="4"/><circle cx="17" cy="7" r="4"/><circle cx="7" cy="17" r="4"/><circle cx="17" cy="17" r="4"/></svg>
+                  <span>Dots</span>
+                </button>
+                <button type="button" class="style-btn" data-val="rounded">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="3"/><rect x="13" y="3" width="8" height="8" rx="3"/><rect x="3" y="13" width="8" height="8" rx="3"/><rect x="13" y="13" width="8" height="8" rx="3"/></svg>
+                  <span>Rounded</span>
+                </button>
+                <button type="button" class="style-btn" data-val="classy">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="1" width="10" height="10" rx="2" transform="rotate(45 12 6)"/><rect x="17" y="11" width="10" height="10" rx="2" transform="rotate(45 22 16)"/><rect x="-3" y="11" width="10" height="10" rx="2" transform="rotate(45 2 16)"/><rect x="7" y="21" width="10" height="10" rx="2" transform="rotate(45 12 26)"/></svg>
+                  <span>Classy</span>
+                </button>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <h4>Eye style</h4>
+              <div class="style-buttons" id="eyeStyleBtns">
+                <button type="button" class="style-btn active" data-val="square">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"/><rect x="8" y="8" width="8" height="8" fill="currentColor"/></svg>
+                  <span>Square</span>
+                </button>
+                <button type="button" class="style-btn" data-val="dot">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+                  <span>Dot</span>
+                </button>
+                <button type="button" class="style-btn" data-val="extra-rounded">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="6"/><rect x="8" y="8" width="8" height="8" rx="4" fill="currentColor"/></svg>
+                  <span>Rounded</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-preview">
+            <div class="qr-output" id="qrOutput">
+              <div class="qr-card">
+                <div class="qr-canvas-wrap" id="qrCanvasWrap">
+                  <!-- QR code renders here -->
+                </div>
+                <div class="qr-url" id="qrUrl"></div>
+                <div class="download-row">
+                  <button class="dl-btn" id="dlPng">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>PNG</span>
+                  </button>
+                  <button class="dl-btn" id="dlSvg">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>SVG</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ── DASHBOARD ── -->
+      <section class="dashboard" id="dashboard">
+        <div class="dashboard-header">
+          <h2>My QR Codes</h2>
+          <button class="refresh-btn" id="refreshBtn" title="Refresh list">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
           </button>
         </div>
-        <p class="error-msg hidden" id="errorMsg">Please enter a valid URL (e.g. https://example.com)</p>
-      </div>
+        <div class="qr-list" id="qrList">
+          <p class="list-placeholder">Loading your QR codes…</p>
+        </div>
+      </section>
 
-      <!-- QR Output -->
-      <div class="qr-output hidden" id="qrOutput">
-        <div class="qr-card">
-          <div class="qr-canvas-wrap" id="qrCanvasWrap">
-            <!-- QR code renders here -->
-          </div>
-          <div class="qr-url" id="qrUrl"></div>
-          <div class="download-row">
-            <button class="dl-btn" id="dlPng">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>PNG</span>
-            </button>
-            <button class="dl-btn" id="dlSvg">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>SVG</span>
-            </button>
+      <!-- Update Modal -->
+      <div class="modal-overlay hidden" id="updateModal">
+        <div class="modal">
+          <h3>Update Destination URL</h3>
+          <p class="modal-id" id="modalQrId"></p>
+          <input type="url" id="updateUrlInput" placeholder="https://new-destination.com">
+          <p class="auth-error hidden" id="updateError"></p>
+          <div class="modal-actions">
+            <button class="auth-btn secondary" id="modalCancelBtn">Cancel</button>
+            <button class="auth-btn primary" id="modalSaveBtn">Save</button>
           </div>
         </div>
       </div>
-    </main>
+
+    </div><!-- end #appContent -->
 
     <!-- Footer -->
     <footer class="footer">
-      <p>Built with speed in mind. No data stored. Ever.</p>
+      <p>Dynamic QR — your links, your control.</p>
     </footer>
   </div>
 
-  <!-- QR Code library (lightweight, client-side) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <!-- QR Code library (advanced styling) -->
+  <script src="https://unpkg.com/qr-code-styling/lib/qr-code-styling.js"></script>
+
+  <!-- Firebase Client SDK (v9 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
   <script src="app.js"></script>
 </body>
 </html>
